@@ -1,7 +1,7 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Esami Sostenuti";
     Layout = "~/Views/Shared/_Layout.cshtml";
+@model List<EcdlBooking.ViewModel.User.Studenti.EsamiSotemutiVM>;
 }
 <div class="container">
     <br />
@@ -14,19 +14,29 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">Data</th>
+                <th scope="col">Data Inscrizione</th>
+                <th scope="col">Data Esame</th>
                 <th scope="col">Modulo</th>
-                <th scope="col">voto</th>
-                
+                <th scope="col">Voto</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-            
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>zmdo</td>
-            </tr>
+            @foreach (var elemento in Model)
+                {
+                var classeRiga = (elemento.Voto < 0) ? "table-warning" : "";
+
+                <tr class="@classeRiga">
+                   
+
+                        <td>@elemento.DataPrenotazione.ToString("dd/MM/yyyy")</td>
+                        <td>@elemento.DataEsame.ToString("dd/MM/yyyy")</td>
+                        <td>@elemento.NomeModulo</td>
+                        <td>@elemento.Voto</td>
+                    </tr>
+                }
+               
+
+
             </tbody>
     </table>
 

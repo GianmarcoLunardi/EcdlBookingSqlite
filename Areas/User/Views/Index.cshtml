@@ -1,12 +1,14 @@
 ﻿
 @{
+   
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Pagina Visualizzazione Del Calendario Esami";
     
 }
+@* cdlBooking.ViewModel.User *@
 @model List<EcdlBooking.Models.Exam>
 
-
+    ciao<----
 
 <div class="bg-success p-2 text-white">
     <h1><i class="bi bi-calendar-day"></i>  Calendario Esami</h1>
@@ -22,7 +24,7 @@
                 <th>Ora</th>
                 <th>Scuola</th>
                 <th>Esaminatore</th>
-                <th>Esame</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -31,10 +33,18 @@
                 @foreach( var exam in Model)
                 {             
 			    <tr>
-				<td>@exam.Data.ToLongDateString()</td>
-                <td>@exam.Ora.ToShortTimeString()</td>
-                <td>@exam.School.Name</td>
-                <td>@exam.Esaminatore.Name @exam.Esaminatore.Surname</td>
+				    <td>@exam.Data.ToLongDateString()</td>
+                    <td>@exam.Ora.ToShortTimeString()</td>
+                    <td>@exam.School.Name</td>
+                    <td>@exam.Esaminatore.Name @exam.Esaminatore.Surname</td>
+                @*
+                    inserimento del menunu a tendina per la selezione del tipo di esamen
+                    ecdl
+                    nel caso in cui l utente è identificato allora è possibile selezionare solo
+                    gli esamei che dovra fare
+
+                Seleziona l esame *@
+
                 <td>
 
 
@@ -78,7 +88,16 @@
         </tbody>
     </table>
 
-  
+  <br /><br />
+                                  <a class="btn btn-success"
+                                   role="button"
+                                   asp-area="User"
+                                   asp-controller="Studenti"
+                                   asp-action="PrenotaEsameAutenticato">
+                                    Prenota l' esame
+                                </a>
+
+                                
 
 
 

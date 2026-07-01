@@ -1,0 +1,94 @@
+﻿
+@{
+    ViewData["Title"] = "PrenotaEsameAutenticato";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model EcdlBooking.ViewModel.User.Studenti.PrenotaEsameVM;
+
+
+
+<div class="bg-success p-2 text-white">
+    <h1><i class="bi bi-calendar-day"></i>  Calendario Esami</h1>
+</div>
+
+
+<br />
+<div class="container">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Giorno</th>
+                <th>Ora</th>
+                <th>Scuola</th>
+                <th>Esaminatore</th>
+                <th>Esame</th>
+                <th>Modulo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                @foreach (var exam in Model.ListaEsami)
+                {
+                    <form asp-area="User"
+                          asp-controller="Studenti"
+                          asp-action="PrenotaEsameAutenticato_Post"
+                          method="post">
+                       
+                    <tr>
+                        <td>@exam.Data.ToLongDateString()</td>
+                        <td>@exam.Ora.ToShortTimeString()</td>
+                        <td>@exam.School.Name</td>
+                        <td>@exam.Esaminatore.Name @exam.Esaminatore.Surname</td>
+                        @*
+                    inserimento del menunu a tendina per la selezione del tipo di esamen
+                    ecdl
+                    nel caso in cui l utente è identificato allora è possibile selezionare solo
+                    gli esamei che dovra fare
+                    Seleziona l esame 
+                    *@
+                        
+                        <td>
+                            <!-- inserimento del attributo  -->
+                            <input type="hidden"
+                                   asp-for="@Model.IdStudente"
+                                   value="@Model.IdStudente"
+                                  />
+                            <input type="hidden"
+                                   asp-for="@Model.IdEsame"
+                                   value="@exam.id" />
+
+
+                                <div class="col-12">
+                                    <select class="form-select"
+                                        asp-for="@Model.ModuloSelezionato"
+                                            asp-items="@Model.ListModuli"></select>
+                                </div>
+
+                          
+                        </td>
+
+                        <td>
+
+                            
+                                <button class="btn btn-success"
+                                   type="submit">
+                                    Prenota l' esame
+                                </button>
+         
+                        </td>
+                    </tr>
+                    </form>
+                }
+            }
+        </tbody>
+    </table>
+
+
+
+
+
+</div>
+
+

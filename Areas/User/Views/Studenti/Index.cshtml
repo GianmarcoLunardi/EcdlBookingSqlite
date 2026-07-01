@@ -2,11 +2,18 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Pagina Visualizzazione Del Calendario Esami";
+   @*
+   @using MioProgetto.Services
+   @inject IMioServizio ServizioInjectato
+    *@
     
 }
 @model List<EcdlBooking.Models.Exam>
 
+@{
 
+    bool Autenticato =  User.Identity.IsAuthenticated;
+}
 
 <div class="bg-success p-2 text-white">
     <h1><i class="bi bi-calendar-day"></i>  Calendario Esami</h1>
@@ -23,6 +30,7 @@
                 <th>Scuola</th>
                 <th>Esaminatore</th>
                 <th>Esame</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +43,31 @@
                 <td>@exam.Ora.ToShortTimeString()</td>
                 <td>@exam.School.Name</td>
                 <td>@exam.Esaminatore.Name @exam.Esaminatore.Surname</td>
+                        <td>
+
+
+
+
+                            @if (!User.Identity.IsAuthenticated)
+                            {
+                                <!--
+                                <div class="col-sm-12">
+                                    <label for="inputModulo" class="form-label-lg">Seleziona l esame</label>
+                                    <select class="form-select form-select-lg"
+                                            asp-for="Modulo"
+                                            asp-items="_unitOfWork.Moduli.GetModuliListForDropDown()"></select>
+                                </div>-->
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("-");
+                            }
+                        </td>
+
+
+
+
                 <td>
 
 
@@ -78,7 +111,15 @@
         </tbody>
     </table>
 
-  
+    <br />  
+    <br />
+    <a class="btn btn-success"
+       role="button"
+       asp-area="User"
+       asp-controller="Studenti"
+       asp-action="PrenotaEsameAutenticato">
+        Prenota l' esame
+    </a>
 
 
 

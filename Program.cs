@@ -15,10 +15,23 @@ using EcdlBooking.Services.Service;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+// Configurazione sqlserver
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//options.UseSqlServer(connectionString));
+// Fine Configurazione sqlserver
+
+// Configurazione di sqlite
+var connectionString = builder.Configuration.GetConnectionString("SqliteConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlite(connectionString));
+// Fine configurazione di sqlite
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+
+
 
 
 // Manca la definizione  dell usermanager

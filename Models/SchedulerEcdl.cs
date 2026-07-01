@@ -24,9 +24,9 @@ namespace EcdlBooking.Models
        // public Exam Exam { get; set; }
 
         public Guid IdModulo { get; set; }
-        //public Modulo Modulo { get; set; }
+       // public Modulo Modulo { get; set; }
 
-        public float voto { get; set; }// numero negativo 
+        public float voto { get; set; } = -1;// numero negativo indica che l'esame non è stato ancora sostenuto
 
     }
 }

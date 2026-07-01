@@ -5,6 +5,8 @@ using EcdlBooking.Services.Interfaces;
 using EcdlBooking.Services.Repository;
 using EcdlBooking.ViewModel;
 using EcdlBooking.ViewModel.User;
+using EcdlBooking.ViewModel.User.Studenti; // contiene il modello di view per la prenotazione dell esame
+using Humanizer.Localisation;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +18,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Security.Claims;
 //using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -57,7 +58,8 @@ namespace EcdlBooking.Controllers
             //     return View(x);
            
         }
-        
+
+
 
 
         public IActionResult VisualizzaEsami()
@@ -71,7 +73,7 @@ namespace EcdlBooking.Controllers
             return View();
         }
 
-        
+        [Authorize]
         public async Task<IActionResult> EsamiSostenuti()
         {
             //ClaimsPrincipal utenteLoggato =  User;
@@ -79,15 +81,45 @@ namespace EcdlBooking.Controllers
             //  string userId = _userManager.GetUserId(User);
 
            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ;
+            var x = _db.SchedulerExams
+                 .Where(e => e.IdStudente == id)
+                 .Join(_db.Moduli, e => e.IdModulo, m => m.Id, (e, m) => new { NomeModulo = m.Nome ,
+                                                                               DataPrenotazione = e.DataPrenotazione,
+                                                                               voto = e.voto,
+                                                                               IdExam = e.IdEsame
+                 })
 
-
+                 .Join(_db.Exams, e =>e.IdExam, ex => ex.id, (e, ex) => new { NomeModulo = e.NomeModulo,
+                                                                             DataPrenotazione = e.DataPrenotazione,
+                                                                             DataEsame = ex.Data,
+                                                                             voto = e.voto,
+                 })
+                .Select(e => new EsamiSotemutiVM
+                {
+                    DataPrenotazione = e.DataPrenotazione,
+                    DataEsame = e.DataEsame,
+                    NomeModulo = e.NomeModulo,
+                    Voto = e.voto
+                })
+                .ToList();
+               
+        
+                ;
             //return View(UtenteLoggato);
-            return View();
+            return View(x);
         }
 
+        // Modulo della pagina per l inserimento di una prenotazione di una specifico modulo 
+        //da parte di uno user loggato
+        /// <summary>
+        /// [Authorize]
+        /// </summary>
+        /// <returns></returns>
+        /// 
 
         [Authorize]
-        public async Task<IActionResult> PrenotaEsame(Guid Id) 
+        public async Task<IActionResult> PrenotaEsameAutenticato ()
         {
             // La consultazione della pagina è fatta solo se un utente è loggato
             // ricerca dell utent loggato
@@ -99,14 +131,17 @@ namespace EcdlBooking.Controllers
             //controllo dei valori trovati
 
 
-                Exam exam = _db.Exams.Find(Id) ;
+               //
+               //Exam exam = _db.Exams.Find(Id) ;
 
 
 
             // User_Studente_PrenotaEsame PE = new User_Studente_PrenotaEsame();
 
-            User_Studente_PrenotaEsame Prenotazione = new User_Studente_PrenotaEsame();
+            //User_Studente_PrenotaEsame Prenotazione = new User_Studente_PrenotaEsame();
 
+            /*
+            PrenotaEsameVM Prenotazione = new PrenotaEsameVM(); Prenotazione.Id = idUser;
 
             //Id = Guid.NewGuid(),
             Prenotazione.DataPrenotazione = DateTime.Today;
@@ -115,13 +150,13 @@ namespace EcdlBooking.Controllers
             Prenotazione.IdEsame = exam.id;
             Prenotazione.Exam = exam;
                 Prenotazione.ListaModuli = _unitOfWork.Moduli.GetModuliListForDropDown();
+            */
 
-
-            EcdlBooking.ViewModel.User.PrenotaEsame record = new PrenotaEsame
+            PrenotaEsameVM record = new PrenotaEsameVM
             {
-                IdEsame= exam.id,
-                IdStudente=utente.Id,
-                ListaModuli = _unitOfWork.Moduli.GetModuliListForDropDown(),
+                IdStudente = idUser,
+                ListaEsami = _unitOfWork.Esami.VisualizzaEsami(),
+                ListModuli = _unitOfWork.Moduli.GetModuliListForDropDown(),
             };
             //User_Studente_PrenotaEsame PE = _unitOfWork.Esami.ViewModel(utente., exam);
 
@@ -131,6 +166,33 @@ namespace EcdlBooking.Controllers
             //return View(Prenotazione);
 
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PrenotaEsameAutenticato_Post(PrenotaEsameVM Prenotazione)
+        {
+
+                if (!ModelState.IsValid)
+                {
+                // Se i dati non sono validi, restituisci la vista con gli errori
+                return Content("errore");//View(Prenotazione);
+                }
+
+                // Se arrivi qui, i dati sono puliti e pronti per il database
+                SchedulerEcdl Prenota = new SchedulerEcdl
+                {
+                    DataPrenotazione = DateTime.Today,
+                    IdStudente = Prenotazione.IdStudente,
+                    IdEsame = Prenotazione.IdEsame,
+                    IdModulo = Guid.Parse(Prenotazione.ModuloSelezionato),
+                    voto = -1 // Imposta un valore negativo per indicare che l'esame non è stato ancora sostenuto
+                };
+
+            int risultato = await _unitOfWork.SchedulerEcdl.PrenotazioneAsync(Prenota);
+
+            return Content("Esame Prenotato");
+        
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> PrenotaEsame_Post(EcdlBooking.ViewModel.User.PrenotaEsame Prenotazione)

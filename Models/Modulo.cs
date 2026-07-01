@@ -16,6 +16,10 @@ namespace EcdlBooking.Models
         // Un modulo può essere prenotato più volte (List<T>)
         // Descritto in moddo matematico
         // Prenotazione: Modulo -> Prenotazioni
-        public List<SchedulerEcdl> Prenotazioni { get; set; }
+        /*
+         * E' una relazione fra le due tabelle Modulo e SchedulerEcdl
+         * Serve poi per la stampa delle prenotazioni di un utente
+         */
+        //public SchedulerEcdl ModuliPrenotazioni { get; set; }
     }
 }
